@@ -2,6 +2,9 @@ extends CharacterBody2D
 
 var bullet_scene = preload("res://scenes/bullet.tscn")
 var fireball_scene = preload("res://scenes/fireball.tscn")
+var thunder_scene = preload("res://scenes/thunder.tscn")
+
+var size = DisplayServer.screen_get_size()
 
 const SPEED = 300.0
 
@@ -23,7 +26,9 @@ func shoot() -> void:
 	# Instance the bullet
 	var bullet = bullet_scene.instantiate()
 	bullet.direction = find_nearest_enemy_direction()
-	add_child(bullet)  # Add the bullet to the scene
+	bullet.position = position
+	
+	get_parent().add_child(bullet)  # Add the bullet to the scene
 	
 	# Set the initial position of the bullet (usually at the player’s position)
 	
@@ -69,12 +74,26 @@ func _on_timer_timeout() -> void:
 
 func shoot_fireball() -> void:
 	var fireball = fireball_scene.instantiate()
+	fireball.position = position
 	fireball.direction = find_nearest_enemy_direction()
-	add_child(fireball)
+	get_parent().add_child(fireball)
 	
 
 
 func _on_fireballcooldown_timeout() -> void:
 	
-	print("fire ball")
 	shoot_fireball()
+
+
+
+func _on_thunderstormcooldown_timeout() -> void:
+	thunder_boom()
+
+func thunder_boom() -> void:
+	var thunder = thunder_scene.instantiate()
+	var camera_position = self.position
+	var x = size[0] / 2
+	var y = size[1] / 2
+	var random_position = Vector2(camera_position[0] + randf_range(-x, x), camera_position[1] + randf_range(-y, y))
+	get_parent().add_child(thunder)
+	thunder.position = random_position

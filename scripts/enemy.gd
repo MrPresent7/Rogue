@@ -2,7 +2,8 @@ extends Node2D
 
 var food_scene = preload("res://scenes/food.tscn")
 var bullet = preload("res://scenes/bullet.tscn")
-@export var death: Node2D
+var fireball_scene = preload("res://scenes/fireball.tscn")
+
 var hp = 10
 
 # Called when the node enters the scene tree for the first time.
@@ -27,10 +28,21 @@ func _on_area_2d_area_entered(area: Area2D) -> void:
 	if area.get_groups()[0] == "damage":
 		if area.name == "bullet":
 			var bullet = bullet.instantiate()
+			
 			hp -= bullet.damage
+		if area.name == 'fireball':
+			var fireball = fireball_scene.instantiate()
+			hp -= fireball.damage
+		if area.name == "thunder":
+			var thunder = area.get_parent()
+			hp -= thunder.damage
 
 func enemy_die() -> void:
 	var food = food_scene.instantiate()
 	food.position = position
 	get_parent().add_child(food)
-	death.play()
+	var death = get_parent().get_node("AudioStreamPlayer")
+	if death:
+		death.play()
+	queue_free()
+	
